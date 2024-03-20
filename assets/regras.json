@@ -1,0 +1,167 @@
+{
+    "PEP": {
+        "3* - Serviços Preliminares": [],
+        "5* - Equipamentos e Ferramentas": [],
+        "6* - Trabalhos em Solo": [],
+        "7* - Contenções": [
+            {
+                "Component": "IfcWall",
+                "Dataframe": [
+                    {
+                        "Propriedade": "Type",
+                        "PropertySet": null,
+                        "Property": null,
+                        "Operação": "Contém",
+                        "Valor": "Cortina Concreto"
+                    }
+                ]
+            }
+        ],
+        "8* - Fundações": [],
+        "9* - Estrutura": [],
+        "10* - Alvenarias, Paredes, Painéis e Fechamentos": [
+            {
+                "Component": "IfcWall",
+                "Dataframe": [
+                    {
+                        "Propriedade": "Type",
+                        "PropertySet": "None",
+                        "Property": "None",
+                        "Operação": "Contém",
+                        "Valor": "Bloco"
+                    },
+                    {
+                        "Propriedade": "Type",
+                        "PropertySet": "None",
+                        "Property": "None",
+                        "Operação": "Contém",
+                        "Valor": "Drywall"
+                    }
+                ]
+            }
+        ],
+        "11* - Cobertura": [],
+        "12* - Impermeabilizações, Isolamentos e Tratamentos": [],
+        "13* - Revestimentos Internos": [
+            {
+                "Component": "IfcWall",
+                "Dataframe": [
+                    {
+                        "Propriedade": "Type",
+                        "PropertySet": "",
+                        "Property": "",
+                        "Operação": "Contém",
+                        "Valor": "Revestimento Interno"
+                    }
+                ]
+            }
+        ],
+        "14* - Revestimentos Externos": [
+            {
+                "Component": "IfcWall",
+                "Dataframe": [
+                    {
+                        "Propriedade": "Type",
+                        "PropertySet": "None",
+                        "Property": "None",
+                        "Operação": "Contém",
+                        "Valor": "Revestimento Externo"
+                    },
+                    {
+                        "Propriedade": "Type",
+                        "PropertySet": "None",
+                        "Property": "None",
+                        "Operação": "Contém",
+                        "Valor": "Moldura EPS"
+                    }
+                ]
+            }
+        ],
+        "15* - Forros": [],
+        "16* - Pisos Internos": [],
+        "17* - Pisos Externos": [],
+        "18* - Mármores e Granitos": [],
+        "19* - Pintura": [],
+        "20* - Esquadrias de Madeira": [],
+        "21* - Esquadrias de Ferro": [
+            {
+                "Component": "IfcRailing",
+                "Dataframe": [
+                    {
+                        "Propriedade": "Name",
+                        "PropertySet": null,
+                        "Property": null,
+                        "Operação": "Começa com",
+                        "Valor": "Guarda-corpo"
+                    }
+                ]
+            }
+        ],
+        "22* - Esquadrias de Alumínio": [
+            {
+                "Component": "IfcWindow",
+                "Dataframe": [
+                    {
+                        "Propriedade": "Type",
+                        "PropertySet": "None",
+                        "Property": "None",
+                        "Operação": "Contém",
+                        "Valor": "JA"
+                    }
+                ]
+            },
+            {
+                "Component": "IfcDoor",
+                "Dataframe": [
+                    {
+                        "Propriedade": "Type",
+                        "PropertySet": "None",
+                        "Property": "None",
+                        "Operação": "Contém",
+                        "Valor": "PA"
+                    }
+                ]
+            }
+        ],
+        "24* - Louças e Metais": [],
+        "25* - Instalações Elétricas": [],
+        "26* - Instalações Hidráulicas": [],
+        "27* - Outras Instalações": [],
+        "28* - Elevadores": [],
+        "30* - Limpezas": []
+    },
+    "Pavimentos": {
+        "COBERTURA": [],
+        "RES. SUPERIOR": [],
+        "BARRILETE": [],
+        "27º PAVIMENTO": [],
+        "26º PAVIMENTO": [],
+        "25º PAVIMENTO": [],
+        "24º PAVIMENTO": [],
+        "23º PAVIMENTO": [],
+        "22º PAVIMENTO": [],
+        "21º PAVIMENTO": [],
+        "20º PAVIMENTO": [],
+        "19º PAVIMENTO": [],
+        "18º PAVIMENTO": [],
+        "17º PAVIMENTO": [],
+        "16º PAVIMENTO": [],
+        "15º PAVIMENTO": [],
+        "14º PAVIMENTO": [],
+        "13º PAVIMENTO": [],
+        "12º PAVIMENTO": [],
+        "11º PAVIMENTO": [],
+        "10º PAVIMENTO": [],
+        "9º PAVIMENTO": [],
+        "8º PAVIMENTO": [],
+        "7º PAVIMENTO": [],
+        "6º PAVIMENTO": [],
+        "5º PAVIMENTO": [],
+        "4º PAVIMENTO": [],
+        "3º PAVIMENTO": [],
+        "2º PAVIMENTO": [],
+        "1º PAVIMENTO": [],
+        "SOBRESOLO": [],
+        "TÉRREO": []
+    }
+}
