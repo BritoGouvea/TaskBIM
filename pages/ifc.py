@@ -29,3 +29,7 @@ for identifier, ifc in st.session_state['ifcs'].items():
         add_param = st.button('Adicionar ActivityCode global', key=f'{identifier}_add')
         if add_param:
             st.session_state['ifcs'][identifier]['params'] = {'ActivityCode': None}
+
+process_button = st.button("Processar IFC")
+if process_button:
+    pass
