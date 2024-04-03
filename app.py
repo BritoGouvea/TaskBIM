@@ -20,7 +20,7 @@ col1, col2 = st.columns(2)
 
 with col1:
     st.subheader("IFC")
-    ifc_files = st.file_uploader("Upload de arquivos .IFC", type='ifc', accept_multiple_files=True)
+    ifc_files = st.file_uploader("Upload de arquivos .IFC", type=['ifc', 'ifczip'], accept_multiple_files=True)
     if not ifc_files:
         try:
             if st.session_state['ifcs']:
