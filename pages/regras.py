@@ -19,11 +19,7 @@ def rules_config_tab(rules_config):
         new_rule_config.save()
         st.session_state['rules_config'].append(str(new_rule_config.unique_id))
         st.rerun()
-
-def element_filter_tab(rules):
-    pass
-
-
+    
 def pep_expander(item):
     
     rules = st.session_state['PEP'][item]
@@ -131,9 +127,11 @@ def main():
 
     for i, rule_config in enumerate(rules_config):
         with tabs[i + 1]:
-            if rule_config.rule_name == 'PEP':
-                for item in st.session_state['PEP'].keys():
-                    pep_expander(item)
+            if rule_config.rule:
+                rule_config.rule.display()
+                tab_save_button = st.button('Salvar', type='primary', key=f'{rule_config.rule_name}_tab_save')
+                if tab_save_button:
+                    rule_config.save()
 
 if __name__ == '__main__':
         
