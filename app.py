@@ -1,5 +1,4 @@
 import streamlit as st
-from task_reader import primavera
 import ifc_classification.system_classification as sc
 from classes.rules import *
 from classes.files import *
@@ -20,7 +19,7 @@ col1, col2 = st.columns(2)
 
 with col1:
     st.subheader("IFC")
-    ifc_files = st.file_uploader("Upload de arquivos .IFC", type=['ifc', 'ifczip'], accept_multiple_files=True)
+    ifc_files = st.file_uploader("Upload de arquivos .IFC", type=['ifc', 'ifczip'], accept_multiple_files=True, label_visibility="collapsed")
     if not ifc_files:
         try:
             if st.session_state['ifcs']:
@@ -29,7 +28,7 @@ with col1:
             pass
 with col2:
     st.subheader("PRIMAVERA-XML")
-    xml_file = st.file_uploader("Upload de arquivos .XML", type='xml')
+    xml_file = st.file_uploader("Upload de arquivos .XML", type='xml', label_visibility="collapsed")
     if not xml_file:
         try:
             st.write(list(st.session_state['xml'].keys()))
@@ -38,7 +37,10 @@ with col2:
 
 if not st.session_state['ifcs']:
     try:
-        st.session_state['ifcs'] = { ifc_file.name: {'file': open_ifc_in_memory(ifc_file), 'params': None}  for ifc_file in ifc_files }
+        st.session_state['ifcs'] = { ifc_file.name: {'file': open_ifc_in_memory(ifc_file),
+                                                     'params': {},
+                                                     'activity_code_types': ['#FASE', '#AREA']
+                                                     }  for ifc_file in ifc_files }
     except:
         pass
 if not st.session_state['xml']:
@@ -46,12 +48,3 @@ if not st.session_state['xml']:
         st.session_state['xml'] = { xml_file.name: open_xml_in_memory(xml_file) if xml_file else None }
     except:
         pass
-
-# if st.button("Processar"):
-#     for ifc_file in ifc_files:
-#         ifc_model = sc.process_classification(ifc_file)
-#     try:
-#         BuildingStory = ifc_model.by_type('IfcBuildingStorey')
-#         st.write(BuildingStory)
-#     except:
-#         st.warning("Necessário carregar modelo")

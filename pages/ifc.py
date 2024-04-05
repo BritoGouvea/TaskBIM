@@ -1,34 +1,48 @@
 import streamlit as st
 from classes.primavera_xml import Plan
-from uuid import uuid4
+from collections import Counter
 
 if 'ifcs' not in st.session_state:
     st.session_state['ifcs'] = None
 if 'xml' not in st.session_state:
     st.session_state['xml'] = None
 
-plan: Plan = list(st.session_state['xml'].values())[0]
-ActivityCodes = {}
-for ActivityCodeType in plan.ActivityCodeTypes.values():
-    key = ActivityCodeType.Name
-    values = [ActivityCode.Description for ActivityCode in ActivityCodeType.ActivityCodes]
-    ActivityCodes.update({key: values})
-
 st.title('IFC')
 
+if not st.session_state['ifcs']:
+    st.warning("Necessário carregar os modelos em IFC ou IFCZIP", icon="⚠️")
+
+if st.session_state['xml']:
+    plan: Plan = list(st.session_state['xml'].values())[0]
+    activity_codes = {}
+    for activity_code_type in plan.ActivityCodeTypes.values():
+        key = activity_code_type.Name
+        values = [activity_code.Description for activity_code in activity_code_type.ActivityCodes]
+        activity_codes.update({key: values})
+    activity_code_types = st.multiselect(
+        'Selecione os Activity Code Types que se aplicam a todos elementos do modelo',
+        options=[ Activity for Activity in activity_codes.keys() ]
+    )
+else:
+    st.warning("Necessário carregar o planejamento em XML", icon="⚠️")
+
+
+
 for identifier, ifc in st.session_state['ifcs'].items():
-    with st.container(border=True):
-        st.write(f"**{identifier}**")
-        if ifc['params']:
-            for key, value in ifc['params'].items():
-                col1, col2, col3 = st.columns([2,2,1])
-                with col1:
-                    activity_code_type = st.selectbox('ActivityCodeType', options=ActivityCodes.keys(), key=f'{uuid4()}_act')
-                with col2:
-                    activity_code = st.selectbox('ActivityCode', options=ActivityCodes[activity_code_type], key=f'{uuid4()}_ac')
-        add_param = st.button('Adicionar ActivityCode global', key=f'{identifier}_add')
-        if add_param:
-            st.session_state['ifcs'][identifier]['params'] = {'ActivityCode': None}
+    with st.expander(f'**{identifier}**'):
+        for activity_code_type in activity_code_types:
+            if activity_code_type in ifc['params']:
+                value = ifc['params'][activity_code_type]
+            else:
+                ifc['params'].update({activity_code_type: None})
+        if activity_code_types:
+            for activity_code_type, col in zip(activity_code_types, st.columns(len(activity_code_types))):
+                with col:
+                    ifc['params'][activity_code_type] = st.selectbox(
+                        activity_code_type,
+                        options=activity_codes[activity_code_type],
+                        key=f'{identifier}_param_{activity_code_type}'
+                    )
 
 process_button = st.button("Processar IFC")
 if process_button:
