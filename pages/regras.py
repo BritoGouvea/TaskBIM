@@ -24,6 +24,16 @@ def main():
 
     ### Loading data
 
+    if 'ruleset' not in st.session_state:
+        st.warning('Ainda não há nenhum conjunto de regras crie o seu primeiro conjunto ou faça o upload na página incial do app', icon='⚠️')
+        st.stop()
+    else:
+        if not st.session_state['ruleset']:
+            st.warning('Ainda não há nenhum conjunto de regras crie o seu primeiro conjunto ou faça o upload na página incial do app', icon='⚠️')
+            st.stop()
+        else:
+            ruleset: Ruleset = pickle.load(open(f'./rules/{st.session_state.ruleset}.ruleset', 'rb'))
+
     if 'rules_config' not in st.session_state:
         st.session_state['rules_config'] = [
             rule_config.removesuffix('.ruleconfig') 
@@ -33,17 +43,15 @@ def main():
     
     rules_config = []
     tabs_name = ['GERAL']
-    if st.session_state['rules_config']:
-        for rule_config in st.session_state['rules_config']:
-            rule_config: RuleConfig = pickle.load(open(f'./rules/{rule_config}.ruleconfig', 'rb'))
-            rules_config.append(rule_config)
-        rule_config_names = [ rule_config.rule_name for rule_config in rules_config ]
-        tabs_name.extend(rule_config_names)
+
+    rules_config = ruleset.rules
+    rule_config_names = [ rule_config.rule_name for rule_config in rules_config ]
+    tabs_name.extend(rule_config_names)
     
     ### Layout
     col1, col2 = st.columns([10, 1])
     with col1:
-        st.title("Regras")
+        st.title(st.session_state['ruleset'])
     with col2:
         rule_save_button = st.button('Salvar', key='rule_save_button', use_container_width=True, type='primary')
     tabs = st.tabs(tabs_name)
@@ -57,10 +65,9 @@ def main():
                 rule_config.rule.display()
     
     if rule_save_button:
-        for rule_config in rules_config:
-            rule_config.save()
+        ruleset.save()
 
 if __name__ == '__main__':
-        
+    
     # Init layout
     main()

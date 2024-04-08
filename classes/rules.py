@@ -6,6 +6,21 @@ from pandas import DataFrame
 from classes.ifc import IfcEntity
 from classes.files import check_duplicates
 
+class Ruleset:
+
+    def __init__(self, name) -> None:
+        self.name: str = name
+        self.global_activity_code_type: list = [None]
+        self.rules: list = []
+
+    def save(self):
+        with open(f'./rules/{str(self.name)}.ruleset', 'wb') as file:
+            pickle.dump(self, file)
+        if self.name not in st.session_state['rulesets']:
+            st.toast(f"{self.name} criada com sucesso", icon='🎉')
+        else:
+            st.toast(f"{self.name} salva com sucesso", icon='🎉')
+
 class RuleConfig:
 
     def __init__(self) -> None:
