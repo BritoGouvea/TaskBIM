@@ -29,7 +29,8 @@ try:
             options.sort()
             return st.column_config.SelectboxColumn(activity_code_type.Name, options=options)
 
-    activity_code_type_columns = { activity_code_type.Name: activity_code_type_column(activity_code_type) for activity_code_type in plan.ActivityCodeTypes.values() }
+    activity_code_type_columns = { activity_code_type.Name: activity_code_type_column(activity_code_type)
+                                  for activity_code_type in plan.ActivityCodeTypes.values() }
 
     column_config = {
         'Id': st.column_config.TextColumn(

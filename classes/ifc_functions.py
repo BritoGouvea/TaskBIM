@@ -1,8 +1,10 @@
 import json
 from ifc_classification import open_ifc_in_memory
-from classes.rules import *
 import ifcopenshell
 import ifcopenshell.util.element as IfcElement
+from classes.rules import PropertyMapping
+import re
+from itertools import chain
 
 def check_ifc_element(ifc_element, filtro):
 
@@ -85,6 +87,70 @@ def process_classification(ifc_file):
     create_pep_classification(ifc_model, elements_list)
     return ifc_model
 
+
+def check_wildcard_match(value, pattern):
+    if "*" not in pattern:
+        return value == pattern
+    # Convert pattern to a regular expression with wildcards replaced by appropriate symbols
+    pattern_regex = re.sub(r"\*", ".*", pattern)
+    # Perform a regular expression match
+    match = re.search(pattern_regex, value)
+    # Return True if there's a match, False otherwise
+    return match is not None
+
+def get_element_attribute(ifc_element, attribute):
+
+    get_attributes = {
+        "Name": lambda e: e.Name,
+        "Description": lambda e: e.Description,
+        "Type": lambda e: e.ObjectType or IfcElement.get_type(e),
+        "Material": lambda e: IfcElement.get_material(e),
+        "PropertySet": lambda e: IfcElement.get_pset(e, attribute[1], attribute[2])
+    }
+    return get_attributes[attribute[0]](ifc_element)
+
+def check_value(ifc_element, attribute, pattern):
+
+    attr = get_element_attribute(ifc_element, attribute)
+    return (check_wildcard_match(attr, pattern))
+
+def set_ifc_attribute(values: dict, attribute):
+
+    set_mapping = {
+        "Name": lambda e, v: setattr(e, 'Name', v),
+        "Description": lambda e, v: setattr(e, 'Description', v),
+        "Type": lambda e, v: setattr(e, 'ObjectType', v),
+        "Material": lambda e: IfcElement.get_material(e),
+        "PropertySet": lambda e: IfcElement.get_pset(e, attribute[1], attribute[2])
+    }
+    for set_value, elements in values.items():
+        for element in elements:
+            set_mapping[attribute[0]](element, set_value)
+
+def property_mapping(ifc_model: ifcopenshell.ifcopenshell.file, rule: PropertyMapping):
+
+    # Valida se o parâmetro de entrada está dentro do padrão
+    classification_dict = {}
+
+    ifc_entities = [
+        item for generator in (ifc_model.by_type(ifc_entity) for ifc_entity in rule.ifc_entities)
+        for item in generator
+    ]
+
+    for value in rule.values:
+        valid_entities = [ifc_entity for ifc_entity in ifc_entities
+                            if check_value(ifc_entity, rule.origin_property, value['Valor modelo'])]
+        if value['Classificação'] not in classification_dict:
+            classification_dict.update({value['Classificação']: valid_entities})
+        else:
+            classification_dict[value['Classificação']].append(valid_entities)
+    if rule.map_to_same_property:
+        destiny_attr = rule.origin_property
+    else:
+        destiny_attr = rule.destiny_property
+    set_ifc_attribute(classification_dict, destiny_attr)
+    
+    return ifc_entities
 
 if __name__ == '__main__':
     

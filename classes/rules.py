@@ -3,7 +3,7 @@ import pickle
 import uuid
 import os
 from pandas import DataFrame
-from classes.ifc import IfcEntity
+from classes import IfcEntity
 from classes.files import check_duplicates
 
 class Ruleset:
@@ -12,6 +12,21 @@ class Ruleset:
         self.name: str = name
         self.global_activity_code_type: list = [None]
         self.rules: list = []
+
+    def display(self):
+
+        for rule in self.rules:
+            delete = rule.display()
+            if delete:
+                self.rules.remove(rule)
+                self.save()
+                st.rerun()
+        
+        add_rule_config = st.button('Adicionar conjunto de regras')
+        if add_rule_config:
+            self.rules.append(RuleConfig())
+            self.save()
+            st.rerun()
 
     def save(self):
         with open(f'./rules/{str(self.name)}.ruleset', 'wb') as file:
@@ -25,19 +40,19 @@ class RuleConfig:
 
     def __init__(self) -> None:
         self.unique_id = uuid.uuid4()
-        self.rule_name: str = ""
+        self.rule_name: str = None
         self.rule_type = None
         self.values: list = []
         self.rule = None
 
-    def __repr__(self) -> str:
-        name = self.rule_name if self.rule_name else ""
-        return "<" + str(self.unique_id) + "-" + name + ">"
+    # def __repr__(self) -> str:
+    #     name = self.rule_name if self.rule_name else ""
+    #     return "<" + str(self.unique_id) + "-" + name + ">"
 
     def display(self) -> None:
 
         with st.container(border=True):
-            col1, col2, col3 = st.columns([3, 3, 0.5])
+            col1, col2, col3 = st.columns([3, 3, 1])
             with col1:
                 self.rule_name = st.text_input(
                     "Nome da regra",
@@ -76,7 +91,9 @@ class RuleConfig:
                     self.values = dataframe.to_dict(orient='records')
                     self.rule.classification_items = [ item['Classificação'] for item in self.values ]
             if delete_button:
-                self.delete()
+                return True
+            else:
+                return False
     
     def rule_mapping(self):
         mapping = {
@@ -85,16 +102,11 @@ class RuleConfig:
         }
         if not self.rule:
             self.rule = mapping[self.rule_type]
-        
-    
-    def save(self):
-        with open(f'./rules/{str(self.unique_id)}.ruleconfig', 'wb') as file:
-            pickle.dump(self, file)
-        st.toast(f"{self.rule_name} salva com sucesso", icon='🎉')
 
     def delete(self):
-        st.session_state['rules_config'].remove(str(self.unique_id))
-        os.remove(f'./rules/{str(self.unique_id)}.ruleconfig')
+        ruleset = pickle(open(f"./rules/{st.session_state.ruleset}.ruleset", "rb"))
+        rule_config = next(x for x in ruleset.rules if x.unique_id == self.unique_id)
+        ruleset.rules.remove(rule_config)
         st.rerun()
 
 class PropertyMapping:
@@ -105,7 +117,7 @@ class PropertyMapping:
         self.ifc_entity_type: str = None
         self.ifc_entities: list = []
         self.map_to_same_property: bool = False
-        self.map_with_same_value: bool = False
+        self.copy_value: bool = False
         self.origin_property: tuple = None
         self.destiny_property: tuple = None
         self.values = None
@@ -117,7 +129,7 @@ class PropertyMapping:
 
         ifc_entity = IfcEntity.ifc_entity()
 
-        col1, col2 = st.columns([1, 5])
+        col1, col2 = st.columns([1, 4])
         with col1:
             self.ifc_entity_type = st.selectbox(
                 label="Tipo da entidade IFC",
@@ -127,6 +139,9 @@ class PropertyMapping:
                 label_visibility='collapsed',
                 key=f"{self.unique_id}_ifc_entity_type_options"
             )
+        if not self.ifc_entity_type:
+            st.warning("Escolha entre IfcElement e IfcSpatialElement para continuar o mapeamento")
+            return None
         element_options = ifc_entity.find_subclass(self.ifc_entity_type).list_all_subclasses()
         for entity in self.ifc_entities:
             if entity not in element_options:
@@ -149,9 +164,9 @@ class PropertyMapping:
                 key=f'{self.unique_id}_map_to_same_property'
             )
         with col2:
-            self.map_with_same_value = st.checkbox(
+            self.copy_value = st.checkbox(
                 "Copiar o valor",
-                value=self.map_with_same_value,
+                value=self.copy_value,
                 disabled=self.map_to_same_property,
                 key=f'{self.unique_id}_map_with_same_value'
             )
@@ -160,20 +175,20 @@ class PropertyMapping:
             origin_attrib = st.selectbox(
                 'Atributo origem',
                 attribute_options,
-                index=attribute_options.index(self.origin_property[0]),
+                index=attribute_options.index(self.origin_property[0]) if self.origin_property else None,
                 key=f'{self.unique_id}_origin_attrib'
             )
         with cols[1]:
             origin_pset = st.text_input(
                 'PropertySet origem',
-                value=self.origin_property[1],
+                value=self.origin_property[1] if self.origin_property else None,
                 disabled=origin_attrib != 'PropertySet',
                 key=f'{self.unique_id}_origin_pset'
             )
         with cols[2]:
             origin_prop = st.text_input(
                 'Property origem',
-                value=self.origin_property[2],
+                value=self.origin_property[2] if self.origin_property else None,
                 disabled=origin_attrib != 'PropertySet',
                 key=f'{self.unique_id}_origin_prop'
             )
@@ -182,27 +197,27 @@ class PropertyMapping:
             destiny_attrib = st.selectbox(
                 'Atributo Destino',
                 attribute_options,
-                index=attribute_options.index(self.destiny_property[0]),
+                index=attribute_options.index(self.destiny_property[0]) if self.destiny_property else None,
                 disabled=self.map_to_same_property,
                 key=f'{self.unique_id}_destiny_attrib'
             )
         with cols[4]:
             destiny_pset = st.text_input(
                 'PropertySet destino',
-                value=self.destiny_property[1],
+                value=self.destiny_property[1] if self.destiny_property else None,
                 disabled=destiny_attrib != 'PropertySet',
                 key=f'{self.unique_id}_destiny_pset'
             )
         with cols[5]:
             destiny_prop = st.text_input(
                 'Property destino',
-                value=self.destiny_property[2],
+                value=self.destiny_property[2] if self.destiny_property else None,
                 disabled=destiny_attrib != 'PropertySet',
                 key=f'{self.unique_id}destiny_prop'
             )
         self.destiny_property = (destiny_attrib, destiny_pset, destiny_prop)
         
-        if not self.map_with_same_value:
+        if not self.copy_value:
             df = DataFrame(self.values, columns = ['Valor modelo', 'Classificação'])
             column_config = {
                 "Classificação": st.column_config.SelectboxColumn(

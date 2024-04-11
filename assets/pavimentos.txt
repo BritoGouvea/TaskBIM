@@ -30,3 +30,29 @@ BARRILETE
 1º PAVIMENTO
 SOBRESOLO
 TÉRREO
+
+3* - Serviços Preliminares
+5* - Equipamentos e Ferramentas
+6* - Trabalhos em Solo
+7* - Contenções
+8* - Fundações
+9* - Estrutura
+10* - Alvenarias Paredes Painéis e Fechamentos
+11* - Cobertura
+12* - Impermeabilizações Isolamentos e Tratamentos
+13* - Revestimentos Internos
+14* - Revestimentos Externos
+15* - Forros
+16* - Pisos Internos
+17* - Pisos Externos
+18* - Mármores e Granitos
+19* - Pintura
+20* - Esquadrias de Madeira
+21* - Esquadrias de Ferro
+22* - Esquadrias de Alumínio
+24* - Louças e Metais
+25* - Instalações Elétricas
+26* - Instalações Hidráulicas
+27* - Outras Instalações
+28* - Elevadores
+30* - Limpezas

@@ -1,6 +1,8 @@
 import streamlit as st
 from classes.primavera_xml import Plan
-from collections import Counter
+import pickle
+import ifcopenshell
+from classes.ifc_functions import property_mapping
 
 if 'ifcs' not in st.session_state:
     st.session_state['ifcs'] = None
@@ -11,6 +13,7 @@ st.title('IFC')
 
 if not st.session_state['ifcs']:
     st.warning("Necessário carregar os modelos em IFC ou IFCZIP", icon="⚠️")
+    st.stop()
 
 if st.session_state['xml']:
     plan: Plan = list(st.session_state['xml'].values())[0]
@@ -25,8 +28,6 @@ if st.session_state['xml']:
     )
 else:
     st.warning("Necessário carregar o planejamento em XML", icon="⚠️")
-
-
 
 for identifier, ifc in st.session_state['ifcs'].items():
     with st.expander(f'**{identifier}**'):
@@ -43,7 +44,3 @@ for identifier, ifc in st.session_state['ifcs'].items():
                         options=activity_codes[activity_code_type],
                         key=f'{identifier}_param_{activity_code_type}'
                     )
-
-process_button = st.button("Processar IFC")
-if process_button:
-    pass

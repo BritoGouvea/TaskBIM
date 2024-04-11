@@ -68,7 +68,7 @@ if not st.session_state['rulesets']:
 create_ruleset_button = False
 col1, col2 = st.columns(2) 
 with col1:
-    colA, colB = st.columns([3,1])
+    colA, colB = st.columns([2,1])
     with colA:
         ruleset_name = st.text_input(
             'Escolha um nome para sua regra',

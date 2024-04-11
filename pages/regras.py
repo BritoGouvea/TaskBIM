@@ -6,20 +6,6 @@ from classes.rules import *
 
 import json
 
-### Funções
-
-def rules_config_tab(rules_config):
-
-    for rule_config in rules_config:
-        rule_config.display()
-
-    add_rule_config = st.button('Adicionar conjunto de regras')
-    if add_rule_config:
-        new_rule_config = RuleConfig()
-        new_rule_config.save()
-        st.session_state['rules_config'].append(str(new_rule_config.unique_id))
-        st.rerun()
-
 def main():
 
     ### Loading data
@@ -34,32 +20,24 @@ def main():
         else:
             ruleset: Ruleset = pickle.load(open(f'./rules/{st.session_state.ruleset}.ruleset', 'rb'))
 
-    if 'rules_config' not in st.session_state:
-        st.session_state['rules_config'] = [
-            rule_config.removesuffix('.ruleconfig') 
-            for rule_config in os.listdir('./rules') 
-            if rule_config.endswith('.ruleconfig')
-        ]
-    
-    rules_config = []
-    tabs_name = ['GERAL']
-
-    rules_config = ruleset.rules
-    rule_config_names = [ rule_config.rule_name for rule_config in rules_config ]
-    tabs_name.extend(rule_config_names)
-    
     ### Layout
     col1, col2 = st.columns([10, 1])
     with col1:
         st.title(st.session_state['ruleset'])
     with col2:
         rule_save_button = st.button('Salvar', key='rule_save_button', use_container_width=True, type='primary')
+    
+    tabs_name = ['GERAL']
+    rule_config_names = [ rule_config.rule_name if rule_config.rule_name else "Sem nome"
+                         for rule_config in ruleset.rules ]
+    tabs_name.extend(rule_config_names)
     tabs = st.tabs(tabs_name)
 
     with tabs[tabs_name.index('GERAL')]:
-        rules_config_tab(rules_config)
+        ruleset.display()
 
-    for i, rule_config in enumerate(rules_config):
+
+    for i, rule_config in enumerate(ruleset.rules):
         with tabs[i + 1]:
             if rule_config.rule:
                 rule_config.rule.display()
