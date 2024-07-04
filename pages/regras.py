@@ -36,11 +36,13 @@ def main():
     with tabs[tabs_name.index('GERAL')]:
         ruleset.display()
 
-
     for i, rule_config in enumerate(ruleset.rules):
         with tabs[i + 1]:
             if rule_config.rule:
                 rule_config.rule.display()
+            if rule_config.save:
+                rule_config.save = False
+                ruleset.save()
     
     if rule_save_button:
         ruleset.save()
