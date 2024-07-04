@@ -1,2 +1,2 @@
-ifcopenshell
+ifcopenshell --no-deps
 streamlit
