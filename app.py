@@ -50,7 +50,8 @@ with col2:
 if not st.session_state['ifcs']:
     try:
         st.session_state['ifcs'] = { ifc_file.name: {'file': open_ifc_in_memory(ifc_file),
-                                                     'activity_codes': {},
+                                                     'params': {},
+                                                     'activity_code_types': ['#FASE', '#AREA']
                                                      }  for ifc_file in ifc_files }
     except:
         pass

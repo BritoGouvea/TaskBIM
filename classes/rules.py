@@ -5,7 +5,6 @@ import os
 from pandas import DataFrame
 from classes import IfcEntity
 from classes.files import check_duplicates
-from classes.primavera_xml import Plan
 
 class Ruleset:
 
@@ -45,7 +44,6 @@ class RuleConfig:
         self.rule_type = None
         self.values: list = []
         self.rule = None
-        self.save = False
 
     # def __repr__(self) -> str:
     #     name = self.rule_name if self.rule_name else ""
@@ -54,7 +52,7 @@ class RuleConfig:
     def display(self) -> None:
 
         with st.container(border=True):
-            col1, col2, col3, col4 = st.columns([2, 3, 1, 1])
+            col1, col2, col3 = st.columns([3, 3, 1])
             with col1:
                 self.rule_name = st.text_input(
                     "Nome da regra",
@@ -76,30 +74,13 @@ class RuleConfig:
                 if self.rule_type:
                     self.rule_mapping()
             with col3:
-                importButtonStatus = True
-                if 'xml' in st.session_state:
-                    if st.session_state['xml']:
-                        importButtonStatus = False
-                        plan: Plan = list(st.session_state['xml'].values())[0]
-                        activity_codes = {}
-                        for activity_code_type in plan.ActivityCodeTypes.values():
-                            key = activity_code_type.Name
-                            values = [activity_code.Description for activity_code in activity_code_type.ActivityCodes]
-                            activity_codes.update({key: values})
-                importButton = st.button('Importar', use_container_width=True, disabled=importButtonStatus, key=f'{self.unique_id}importbutton')
-                if importButton:
-                    self.values = [{ 'Classificação': item } for item in activity_codes[self.rule_name]]
-                    self.rule.classification_items = [ item['Classificação'] for item in self.values ]
-                    self.save = True
-            with col4:
                 with st.popover("Deletar", use_container_width=True):
                     st.write("Você tem certeza que quer deletar?")
                     delete_button = st.button('Sim', type='primary', key=f'{self.unique_id}_delete')
+
             df = DataFrame(self.values, columns = ['Classificação'])
             with st.expander("Itens"):
                 if self.rule_type:
-                    if [f'{self.unique_id}_df_values'] in st.session_state:
-                        del st.session_state[f'{self.unique_id}_df_values']
                     dataframe = st.data_editor(
                             data=df,
                             num_rows='dynamic',
@@ -113,7 +94,7 @@ class RuleConfig:
                 return True
             else:
                 return False
-
+    
     def rule_mapping(self):
         mapping = {
             'Filtro de elementos': ElementFilter(),
@@ -137,13 +118,12 @@ class PropertyMapping:
         self.ifc_entities: list = []
         self.map_to_same_property: bool = False
         self.copy_value: bool = False
-        self.create_classification: bool = False
         self.origin_property: tuple = None
         self.destiny_property: tuple = None
         self.values = None
 
     def display(self) -> None:
-       
+        
         ifc_entity_type_options = ['IfcElement', 'IfcSpatialElement']
         attribute_options = ['Name', 'Description', 'Type', 'Material','PropertySet']
 
@@ -176,7 +156,7 @@ class PropertyMapping:
                 label_visibility='collapsed',
                 key=f'{self.unique_id}_ifc_entities'
             )
-        col1, col2, col3 = st.columns(3)
+        col1, col2, col3 = st.columns([1, 1, 2])
         with col1:
             self.map_to_same_property = st.checkbox(
                 "Mapear para o mesmo atributo",
@@ -190,19 +170,12 @@ class PropertyMapping:
                 disabled=self.map_to_same_property,
                 key=f'{self.unique_id}_map_with_same_value'
             )
-        with col3:
-            self.create_classification = st.checkbox(
-                "Criar classificação",
-                value=self.create_classification,
-                disabled=self.map_to_same_property,
-                key=f'{self.unique_id}_create_classification'
-            )
         cols = st.columns(6)
         with cols[0]:
             origin_attrib = st.selectbox(
                 'Atributo origem',
                 attribute_options,
-                index=attribute_options.index(self.origin_property[0]) if self.origin_property[0] else None,
+                index=attribute_options.index(self.origin_property[0]) if self.origin_property else None,
                 key=f'{self.unique_id}_origin_attrib'
             )
         with cols[1]:
@@ -224,7 +197,7 @@ class PropertyMapping:
             destiny_attrib = st.selectbox(
                 'Atributo Destino',
                 attribute_options,
-                index=attribute_options.index(self.destiny_property[0]) if self.destiny_property[0] else None,
+                index=attribute_options.index(self.destiny_property[0]) if self.destiny_property else None,
                 disabled=self.map_to_same_property,
                 key=f'{self.unique_id}_destiny_attrib'
             )
@@ -251,7 +224,7 @@ class PropertyMapping:
                     "Item da classificação",
                     options=self.classification_items,
                     required=True
-                ) 
+                )
             }
             dataframe = st.data_editor(
                     data=df,
@@ -262,7 +235,6 @@ class PropertyMapping:
                     key=f'{self.unique_id}_df_values'
                 )
             self.values = dataframe.to_dict(orient='records')
-
 
 class ElementFilter:
 
