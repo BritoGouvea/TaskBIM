@@ -1,2 +1,4 @@
 streamlit
-ifcopenshell
+mathutils@2.81.2
+ifcopenshell@0.7.0.240406
+
