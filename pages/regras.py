@@ -31,6 +31,7 @@ def main():
     rule_config_names = [ rule_config.rule_name if rule_config.rule_name else "Sem nome"
                          for rule_config in ruleset.rules ]
     tabs_name.extend(rule_config_names)
+    tabs_name = set(tabs_name)
     tabs = st.tabs(tabs_name)
 
     with tabs[tabs_name.index('GERAL')]:
