@@ -138,8 +138,8 @@ class PropertyMapping:
         self.map_to_same_property: bool = False
         self.copy_value: bool = False
         self.create_classification: bool = False
-        self.origin_property: tuple = None
-        self.destiny_property: tuple = None
+        self.origin_property: tuple = ()
+        self.destiny_property: tuple = ()
         self.values = None
 
     def display(self) -> None:
