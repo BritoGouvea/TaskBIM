@@ -40,7 +40,8 @@ def main():
     for i, rule_config in enumerate(ruleset.rules):
         with tabs[i + 1]:
             if rule_config.rule:
-                rule_config.rule.display()
+                if rule_config.rule_name in rule_config_names:
+                    rule_config.rule.display()
             if rule_config.save:
                 rule_config.save = False
                 ruleset.save()
