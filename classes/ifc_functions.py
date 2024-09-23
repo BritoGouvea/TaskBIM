@@ -4,7 +4,6 @@ import ifcopenshell
 import ifcopenshell.util.element as IfcElement
 from classes.rules import PropertyMapping
 import re
-from itertools import chain
 
 def check_ifc_element(ifc_element, filtro):
 
@@ -87,15 +86,11 @@ def process_classification(ifc_file):
     create_pep_classification(ifc_model, elements_list)
     return ifc_model
 
-
 def check_wildcard_match(value, pattern):
     if "*" not in pattern:
         return value == pattern
-    # Convert pattern to a regular expression with wildcards replaced by appropriate symbols
     pattern_regex = re.sub(r"\*", ".*", pattern)
-    # Perform a regular expression match
     match = re.search(pattern_regex, value)
-    # Return True if there's a match, False otherwise
     return match is not None
 
 def get_element_attribute(ifc_element, attribute):
@@ -149,8 +144,6 @@ def property_mapping(ifc_model: ifcopenshell.ifcopenshell.file, rule: PropertyMa
     else:
         destiny_attr = rule.destiny_property
     set_ifc_attribute(classification_dict, destiny_attr)
-    
-    return ifc_entities
 
 if __name__ == '__main__':
     
